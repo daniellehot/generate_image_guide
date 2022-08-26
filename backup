@@ -1,0 +1,39 @@
+from tkinter import N
+import numpy as np
+import random
+
+min_number_of_specimens = 10
+max_number_of_specimens = 15
+
+def generate_species_and_specimens(number_of_images):
+    #species = ["cod", "pollock", "haddock", "whitting", "other"]
+    species = ["cod", "pollock", "haddock", "whitting"]
+    sum = random.randint(min_number_of_specimens, max_number_of_specimens)
+    #print(sum)
+
+    arr = np.random.randint(100, size=len(species))
+    arr = np.divide(arr, np.sum(arr))
+    #print(arr)
+    
+    specimens = np.around(arr*sum)
+    print(specimens)
+
+    random.shuffle(species)
+    print(species)
+
+    species_order = []
+    for (fish, number) in zip(species, specimens):
+        for i in range(int(number)):
+            species_order.append(fish)
+    print(species_order)
+    return 
+    
+    
+
+
+if __name__=="__main__":
+    number_of_images = 10
+    number_of_species = generate_species_and_specimens(number_of_images)
+    mapping = generate_mapping()
+
+    np.savetxt("number_of_species.csv", data, delimiter=",", fmt ='%.0f', header="cod, haddock, pollock, whiting, other", comments="")
