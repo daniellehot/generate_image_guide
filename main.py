@@ -13,7 +13,7 @@ import openpyxl
 min_number_of_specimens = 5
 max_number_of_specimens = 15
 stat = [0, 0, 0, 0] #cod, pollock, haddock, whitting
-number_of_images = 20
+number_of_images = 250
 excel_file = ("guide.xlsx")
 empty_row = ["------------------" for i in range(26)]
 
