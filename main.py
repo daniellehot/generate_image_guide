@@ -1,12 +1,15 @@
 #from copy import copy
 #from tkinter import N
+from csv import excel_tab
+from email.mime import image
 from re import M
 import numpy as np
 import random
-import csv
+#import csv
+import openpyxl
 
 min_number_of_specimens = 5
-max_number_of_specimens = 50
+max_number_of_specimens = 15
 stat = [0, 0, 0, 0] #cod, pollock, haddock, whitting
 
 
@@ -58,20 +61,51 @@ def get_statistics(specimens, species_order):
         idx = species.index(fish)
         stat[idx] += number 
 
+def  generate_rotations(locations):
+    return [random.randint(1,12) for i in range(len(locations))]
+
+
+def save_data(path, image, fishes, order, pos, rot):
+    workbook = openpyxl.load_workbook(path)
+    sheet = workbook.active
+
+    workbook.save(filename="guide.xlsx")
 
 if __name__=="__main__":
     header = ['Image', 'Species', 'Specimens', 'Positions']
-    number_of_images = 500
+    number_of_images = 250
+    excel_file = ("guide.xlsx")
     for i in range(number_of_images):
+        image_number = i
         specimens, species_order, species_order_long = generate_species_and_specimens()
-        mapping =generate_mapping(species_order_long)
+        mapping = generate_mapping(species_order_long)
+        rotations = generate_rotations(mapping)
         statistics = get_statistics(specimens, species_order)
         
         print(specimens)
         print(species_order)
         print(mapping)
-        print("===================")
-    print(stat)
+        print(rotations)
+        print("%%%%%%%%%%%%%%%%%%%")
+        for (fish, number) in zip(species_order, specimens):
+            number = int(number)
+            row = []
+            row.append(image_number)
+            row.append(fish)
+            #row.append("|")
+            for i in range(number):
+                row.append(mapping[i])
+                row.append(rotations[i])
+                row.append("|")
+            del mapping[:number]
+            del rotations[:number]
+            print(row)
+            print("===================")
+            
+            
+        #save_data(excel_file, i, specimens, species_order, mapping, rotations)
+    #print(stat)
+
     for value in stat:
         temp = value/sum(stat)*100
-        print(temp)
+        #print(temp)
