@@ -1,16 +1,21 @@
 #from copy import copy
 #from tkinter import N
 from csv import excel_tab
+import email
 from email.mime import image
 from re import M
 import numpy as np
 import random
+import os
 #import csv
 import openpyxl
 
 min_number_of_specimens = 5
 max_number_of_specimens = 15
 stat = [0, 0, 0, 0] #cod, pollock, haddock, whitting
+number_of_images = 20
+excel_file = ("guide.xlsx")
+empty_row = ["------------------" for i in range(26)]
 
 
 def generate_species_and_specimens():
@@ -61,22 +66,31 @@ def get_statistics(specimens, species_order):
         idx = species.index(fish)
         stat[idx] += number 
 
+
 def  generate_rotations(locations):
     return [random.randint(1,12) for i in range(len(locations))]
 
 
-def save_data(path, image, fishes, order, pos, rot):
-    workbook = openpyxl.load_workbook(path)
-    sheet = workbook.active
+def save_data(path, row):
+    wb = openpyxl.load_workbook(path)
+    ws = wb.active
+    ws.append(row)
+    wb.save(filename="guide.xlsx")
 
-    workbook.save(filename="guide.xlsx")
+
+def reset_guide(path):
+    wb = openpyxl.load_workbook(path)
+    ws = wb.active
+    ws.delete_rows(1, ws.max_row+1)
+    wb.save(filename="guide.xlsx")
+
 
 if __name__=="__main__":
-    header = ['Image', 'Species', 'Specimens', 'Positions']
-    number_of_images = 250
-    excel_file = ("guide.xlsx")
+    #Check if the file is empty. If not, clean it
+    if os.stat(excel_file).st_size != 0:
+        reset_guide(excel_file)
+
     for i in range(number_of_images):
-        image_number = i
         specimens, species_order, species_order_long = generate_species_and_specimens()
         mapping = generate_mapping(species_order_long)
         rotations = generate_rotations(mapping)
@@ -90,17 +104,19 @@ if __name__=="__main__":
         for (fish, number) in zip(species_order, specimens):
             number = int(number)
             row = []
-            row.append(image_number)
+            row.append(i+1)
             row.append(fish)
-            #row.append("|")
-            for i in range(number):
-                row.append(mapping[i])
-                row.append(rotations[i])
-                row.append("|")
+            row.append(number)
+            row.append("||")
+            for j in range(number):
+                row.append(mapping[j])
+                row.append(rotations[j])
+                row.append("||")
             del mapping[:number]
             del rotations[:number]
             print(row)
-            print("===================")
+            save_data(excel_file, row)
+        save_data(excel_file, empty_row)
             
             
         #save_data(excel_file, i, specimens, species_order, mapping, rotations)
